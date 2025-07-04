@@ -17,3 +17,6 @@
   - Repository variables
     - LLM_MODEL: openai/gpt-4.1-mini
     - TARGET_BRANCH: develop or master
+
+## Versions
+Base: 1.0.0
