@@ -72,17 +72,23 @@ jobs:
         cd nagiyu-template
         git remote set-url origin https://x-access-token:${{ env.GITHUB_PERSONAL_ACCESS_TOKEN }}@github.com/nagiyu/nagiyu-template.git
 
-    - name: Commit Changes
+    - name: Commit and Push if Changes Exist
       run: |
         cd nagiyu-template
-        git add .
-        git commit -m "Update common files from the child repository"
-        git push origin ${{ env.BRANCH_NAME }}
+        if [ -n "$(git status --porcelain)" ]; then
+          git add .
+          git commit -m "Update common files from the child repository"
+          git push origin ${{ env.BRANCH_NAME }}
+          echo "CHANGES_EXIST=true" >> $GITHUB_ENV
+        else
+          echo "No changes to commit."
+          echo "CHANGES_EXIST=false" >> $GITHUB_ENV
+        fi
 
     - name: Create Pull Request
+      if: env.CHANGES_EXIST == 'true'
       env:
         GH_TOKEN: ${{ env.GITHUB_PERSONAL_ACCESS_TOKEN }}
       run: |
         cd nagiyu-template
-        gh pr create --title "Update common files" --body "This PR updates common files from the child repository." --base master --head ${{ env.BRANCH_NAME }} --draft
-
+        gh pr create --title "Update common files" --body "This PR updates common files from the child repository." --base master --head ${{ env.BRANCH_NAME }}
