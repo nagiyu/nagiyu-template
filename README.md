@@ -20,29 +20,5 @@
     - LLM_MODEL: openai/gpt-4.1-mini
     - TARGET_BRANCH: develop or master
 
-### パス生成
-```bash
-web-push generate-vapid-keys
-```
-
 ### AWS
-- Elastic Container Registry
-- Lambda
 - Secrets Manager
-
-#### Lambda
-- メモリ: 128 MB
-- エフェメラルストレージ: 512 MB
-- タイムアウト (e.g. 3分)
-- 関数URL: ON
-- アクセス権限: SecretsManagerReadWrite
-
-#### Secrets Manager
-- CLIENT_PROJECT_NAME (e.g. nextjs-base)
-- CLIENT_BASE_URL
-- VAPID_PUBLIC_KEY
-- VAPID_PRIVATE_KEY
-- VAPID_SUBJECT (e.g. admin@sample.comt)
-- AWS_ACCESS_KEY (for Local)
-- AWS_SECRET_ACCESS_KEY (for Local)
-- AWS_REGION
