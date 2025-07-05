@@ -76,7 +76,7 @@ jobs:
               git push origin "$BRANCH_NAME"
 
               export GH_TOKEN="${{ env.GITHUB_PERSONAL_ACCESS_TOKEN }}"
-              gh pr create --title "Apply template updates" --body "This PR applies template updates." --base "$BRANCH" --head "$BRANCH_NAME"
+              gh pr create --title "Apply template updates" --body "This PR applies template updates." --base "$BRANCH" --head "$BRANCH_NAME" --draft
             else
               echo "No changes to commit for $REPO_URL"
             fi
