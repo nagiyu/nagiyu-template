@@ -65,7 +65,7 @@ jobs:
     - name: Configure Git
       run: |
         cd nagiyu-template
-        git config --local user.name "GitHub Actions"
+        git config --local user.name "${{ env.GITHUB_USERNAME }}"
         git config --local user.email "${{ env.GITHUB_EMAIL }}"
 
     - name: Commit Changes
