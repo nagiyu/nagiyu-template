@@ -1,0 +1,86 @@
+name: Apply Template
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+      - template/*
+    paths:
+      - '.github/ISSUE_TEMPLATE/issue.md'
+      - '.github/workflows/apply-template.yml'
+      - '.github/workflows/deploy.yml'
+      - '.github/workflows/openhands-resolver.yml'
+      - '.github/workflows/update-common.yml'
+      - 'README.md'
+
+jobs:
+  apply-template:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: AWS CLI install
+        run: |
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip
+          sudo ./aws/install --update
+          aws --version
+
+      - name: AWS set Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Get Secrets from AWS SecretsManager
+        uses: aws-actions/aws-secretsmanager-get-secrets@v2
+        with:
+          secret-ids: |
+            GitHub
+          parse-json-secrets: true
+
+      - name: Checkout Template Repository
+        uses: actions/checkout@v2
+
+      - name: Apply Template to Target Repositories
+        run: |
+          IFS=';' read -ra TARGETS <<< "${{ env.GITHUB_TEMPLATE_TARGETS }}"
+          for TARGET in "${TARGETS[@]}"; do
+            REPO_URL=$(echo "$TARGET" | cut -d',' -f1)
+            BRANCH=$(echo "$TARGET" | cut -d',' -f2)
+            REPO_NAME=$(basename -s .git "$REPO_URL")
+            echo "Processing $REPO_URL ($BRANCH)"
+
+            git clone "$REPO_URL"
+            cd "$REPO_NAME"
+            git checkout "$BRANCH"
+
+            cp ../.github/ISSUE_TEMPLATE/issue.md .github/ISSUE_TEMPLATE/issue.md
+            cp ../.github/workflows/apply-template.yml .github/workflows/apply-template.yml
+            cp ../.github/workflows/deploy.yml .github/workflows/deploy.yml
+            cp ../.github/workflows/openhands-resolver.yml .github/workflows/openhands-resolver.yml
+            cp ../.github/workflows/update-common.yml .github/workflows/update-common.yml
+            cp ../README.md README.md
+
+            git config --local user.name "${{ env.GITHUB_USERNAME }}"
+            git config --local user.email "${{ env.GITHUB_EMAIL }}"
+            git remote set-url origin "https://x-access-token:${{ env.GITHUB_PERSONAL_ACCESS_TOKEN }}@${REPO_URL#https://}"
+
+            BRANCH_NAME="apply-template-$(date +%Y%m%d-%H%M%S)"
+            git checkout -b "$BRANCH_NAME"
+
+            if [ -n "$(git status --porcelain)" ]; then
+              git add .
+              git commit -m "Apply template updates"
+              git push origin "$BRANCH_NAME"
+
+              export GH_TOKEN="${{ env.GITHUB_PERSONAL_ACCESS_TOKEN }}"
+              gh pr create --title "Apply template updates" --body "This PR applies template updates." --base "$BRANCH" --head "$BRANCH_NAME"
+            else
+              echo "No changes to commit for $REPO_URL"
+            fi
+
+            cd ..
+            rm -rf "$REPO_NAME"
+          done
