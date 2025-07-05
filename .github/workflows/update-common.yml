@@ -67,6 +67,11 @@ jobs:
         cd nagiyu-template
         git config --local user.name "${{ env.GITHUB_USERNAME }}"
         git config --local user.email "${{ env.GITHUB_EMAIL }}"
+    
+    - name: Set up push authentication
+      run: |
+        cd nagiyu-template
+        git remote set-url origin https://x-access-token:${{ env.GITHUB_PERSONAL_ACCESS_TOKEN }}@github.com/nagiyu/nagiyu-template.git
 
     - name: Commit Changes
       run: |
