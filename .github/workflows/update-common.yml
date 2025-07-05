@@ -5,6 +5,7 @@ on:
     branches:
       - master
       - develop
+      - template/*
     paths:
       - '.github/ISSUE_TEMPLATE/issue.md'
       - '.github/workflows/deploy.yml'
