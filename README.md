@@ -3,7 +3,6 @@
 ## 使い方
 
 ### GitHub
-
 - Settings -> General -> Pull Requests -> Automatically delete head branches: ON
 - Settings -> Rules -> Rulesets: Import
 - Settings -> Actions -> Workflow permissions
@@ -20,3 +19,6 @@
   - Repository variables
     - LLM_MODEL: openai/gpt-4.1-mini
     - TARGET_BRANCH: develop or master
+
+### AWS
+- Secrets Manager
