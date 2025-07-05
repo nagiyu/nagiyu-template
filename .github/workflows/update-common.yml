@@ -55,12 +55,11 @@ jobs:
 
     - name: Copy Common Files
       run: |
-        cd nagiyu-template
-        cp ../.github/ISSUE_TEMPLATE/issue.md .
-        cp ../.github/workflows/deploy.yml .
-        cp ../.github/workflows/openhands-resolver.yml .
-        cp ../.github/workflows/update-common.yml .
-        cp ../README.md .
+        cp .github/ISSUE_TEMPLATE/issue.md nagiyu-template/.github/ISSUE_TEMPLATE/issue.md
+        cp .github/workflows/deploy.yml nagiyu-template/.github/workflows/deploy.yml
+        cp .github/workflows/openhands-resolver.yml nagiyu-template/.github/workflows/openhands-resolver.yml
+        cp .github/workflows/update-common.yml nagiyu-template/.github/workflows/update-common.yml
+        cp README.md nagiyu-template/README.md
 
     - name: Configure Git
       run: |
@@ -85,4 +84,5 @@ jobs:
         GH_TOKEN: ${{ env.GITHUB_PERSONAL_ACCESS_TOKEN }}
       run: |
         cd nagiyu-template
-        gh pr create --title "Update common files" --body "This PR updates common files from the child repository." --base master --head ${{ env.BRANCH_NAME }}
+        gh pr create --title "Update common files" --body "This PR updates common files from the child repository." --base master --head ${{ env.BRANCH_NAME }} --draft
+
