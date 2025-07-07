@@ -51,7 +51,7 @@ export default class SecretsManagerUtil {
     };
 
     try {
-      const secretsManagerClient = this.getSecretsManagerClient();
+      const secretsManagerClient = SecretsManagerUtil.getSecretsManagerClient();
       const command = new GetSecretValueCommand(input);
 
       const response = await secretsManagerClient.send(command);
