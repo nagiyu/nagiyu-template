@@ -37,12 +37,16 @@ COPY --from=public.ecr.aws/awsguru/aws-lambda-adapter:0.9.1 /lambda-adapter /opt
 
 ENV AWS_LWA_PORT=3000
 
-WORKDIR /app
+WORKDIR /app/common
 
-COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/common .
 
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next/static ./.next/static
+WORKDIR /app/nextjs
+
+COPY --from=builder /app/nextjs/.next/standalone ./
+
+COPY --from=builder /app/nextjs/public ./public
+COPY --from=builder /app/nextjs/.next/static ./.next/static
 
 USER node
 
