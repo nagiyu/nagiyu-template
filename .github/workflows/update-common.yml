@@ -12,7 +12,6 @@ on:
       - '.github/workflows/deploy.yml'
       - '.github/workflows/openhands-resolver.yml'
       - '.github/workflows/update-common.yml'
-      - 'client/common/*'
       - 'README.md'
 
 jobs:
@@ -53,8 +52,7 @@ jobs:
     - name: Checkout New Branch
       run: |
         cd nagiyu-template
-        git fetch origin template/client-nextjs
-        git checkout -b ${{ env.BRANCH_NAME }} origin/template/client-nextjs
+        git checkout -b ${{ env.BRANCH_NAME }}
 
     - name: Copy Common Files
       run: |
@@ -63,7 +61,6 @@ jobs:
         cp .github/workflows/deploy.yml nagiyu-template/.github/workflows/deploy.yml
         cp .github/workflows/openhands-resolver.yml nagiyu-template/.github/workflows/openhands-resolver.yml
         cp .github/workflows/update-common.yml nagiyu-template/.github/workflows/update-common.yml
-        cp -r client/common nagiyu-template/client/common
         cp README.md nagiyu-template/README.md
 
     - name: Configure Git
