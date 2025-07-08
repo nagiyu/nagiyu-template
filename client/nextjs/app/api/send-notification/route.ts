@@ -11,11 +11,11 @@ export async function POST(req: NextRequest) {
     }
 
     // VAPID keys should be set in environment variables
-    const VAPID_PUBLIC_KEY = await SecretsManagerUtil.getSecretValue('ClientNextjsTemplate', 'VAPID_PUBLIC_KEY');
-    const VAPID_PRIVATE_KEY = await SecretsManagerUtil.getSecretValue('ClientNextjsTemplate', 'VAPID_PRIVATE_KEY');
+    const VAPID_PUBLIC_KEY = await SecretsManagerUtil.getSecretValue('ClientNextjsTemplate', 'VAPID_PUBLIC_KEY', true);
+    const VAPID_PRIVATE_KEY = await SecretsManagerUtil.getSecretValue('ClientNextjsTemplate', 'VAPID_PRIVATE_KEY', true);
 
     // Ensure VAPID_SUBJECT is properly formatted with mailto: prefix
-    const envSubject = await SecretsManagerUtil.getSecretValue('ClientNextjsTemplate', 'VAPID_SUBJECT') || 'admin@example.com';
+    const envSubject = await SecretsManagerUtil.getSecretValue('ClientNextjsTemplate', 'VAPID_SUBJECT', true) || 'admin@example.com';
     const VAPID_SUBJECT = envSubject.startsWith('mailto:') ? envSubject : `mailto:${envSubject}`;
 
     if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY) {

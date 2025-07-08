@@ -9,24 +9,22 @@ export default class SecretsManagerUtil {
   private static secretsCache = new Map<string, Record<string, string>>();
 
   /**
-   * Creates a SecretsManagerClient based on the environment.
+   * Creates a SecretsManagerClient based on the environment and initLoad flag.
+   * @param initLoad If true, always use credentials from environment variables. If false (default), use credentials only if environment is 'local'.
    * @returns {SecretsManagerClient} The configured SecretsManagerClient.
-   * If the environment is 'local', it uses credentials from environment variables.
-   * Otherwise, it uses the default credentials provider chain.
    */
-  private static getSecretsManagerClient(): SecretsManagerClient {
-    if (process.env.PROCESS_ENV !== 'local') {
+  private static getSecretsManagerClient(initLoad = false): SecretsManagerClient {
+    if (initLoad || process.env.PROCESS_ENV === 'local') {
       return new SecretsManagerClient({
-        region: process.env.CLIENT_NEXTJS_TEMPLATE_AWS_REGION
+        region: process.env.CLIENT_NEXTJS_TEMPLATE_AWS_REGION,
+        credentials: {
+          accessKeyId: process.env.CLIENT_NEXTJS_TEMPLATE_AWS_ACCESS_KEY!,
+          secretAccessKey: process.env.CLIENT_NEXTJS_TEMPLATE_AWS_SECRET_ACCESS_KEY!,
+        },
       });
     }
-
     return new SecretsManagerClient({
-      region: process.env.CLIENT_NEXTJS_TEMPLATE_AWS_REGION,
-      credentials: {
-        accessKeyId: process.env.CLIENT_NEXTJS_TEMPLATE_AWS_ACCESS_KEY!,
-        secretAccessKey: process.env.CLIENT_NEXTJS_TEMPLATE_AWS_SECRET_ACCESS_KEY!,
-      },
+      region: process.env.CLIENT_NEXTJS_TEMPLATE_AWS_REGION
     });
   }
 
@@ -34,10 +32,11 @@ export default class SecretsManagerUtil {
    * Retrieves the value for a specific key from a secret stored as a JSON object in AWS Secrets Manager.
    * @param secretName The name of the secret to retrieve.
    * @param keyName The key within the secret JSON object to retrieve.
+   * @param initLoad If true, always use credentials from environment variables. If false (default), use credentials only if environment is 'local'.
    * @throws Throws an error using throwError if retrieval fails, the secret is not found, or the key does not exist.
    * @returns The secret value for the given key as a string.
    */
-  public static async getSecretValue(secretName: string, keyName: string): Promise<string> {
+  public static async getSecretValue(secretName: string, keyName: string, initLoad = false): Promise<string> {
     // Check cache first
     if (this.secretsCache.has(secretName)) {
       const cachedObj = this.secretsCache.get(secretName);
@@ -51,7 +50,7 @@ export default class SecretsManagerUtil {
     };
 
     try {
-      const secretsManagerClient = SecretsManagerUtil.getSecretsManagerClient();
+      const secretsManagerClient = SecretsManagerUtil.getSecretsManagerClient(initLoad);
       const command = new GetSecretValueCommand(input);
 
       const response = await secretsManagerClient.send(command);
