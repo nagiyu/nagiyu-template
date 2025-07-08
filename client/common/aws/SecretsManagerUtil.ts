@@ -16,15 +16,15 @@ export default class SecretsManagerUtil {
   private static getSecretsManagerClient(initLoad = false): SecretsManagerClient {
     if (initLoad || process.env.PROCESS_ENV === 'local') {
       return new SecretsManagerClient({
-        region: process.env.TOOLS_AWS_REGION,
+        region: process.env.CLIENT_NEXTJS_TEMPLATE_AWS_REGION,
         credentials: {
-          accessKeyId: process.env.TOOLS_AWS_ACCESS_KEY!,
-          secretAccessKey: process.env.TOOLS_AWS_SECRET_ACCESS_KEY!,
+          accessKeyId: process.env.CLIENT_NEXTJS_TEMPLATE_AWS_ACCESS_KEY!,
+          secretAccessKey: process.env.CLIENT_NEXTJS_TEMPLATE_AWS_SECRET_ACCESS_KEY!,
         },
       });
     }
     return new SecretsManagerClient({
-      region: process.env.TOOLS_AWS_REGION
+      region: process.env.CLIENT_NEXTJS_TEMPLATE_AWS_REGION
     });
   }
 

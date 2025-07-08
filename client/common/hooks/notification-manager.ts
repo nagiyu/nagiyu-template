@@ -65,7 +65,7 @@ export function useNotificationManager() {
       const sub = await registration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(
-          await SecretsManagerUtil.getSecretValue('DevTools', 'VAPID_PUBLIC_KEY', true)
+          await SecretsManagerUtil.getSecretValue('ClientNextjsTemplate', 'VAPID_PUBLIC_KEY', true)
         ),
       })
       setSubscription(sub)
