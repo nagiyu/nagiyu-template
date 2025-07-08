@@ -1,8 +1,8 @@
 ---
-name: Issue
-about: Issue のテンプレート
-title: ""
-labels: []
+name: Tools Issue
+about: Tools の Issue のテンプレート
+title: "[Tools]"
+labels: ["tools"]
 assignees: []
 ---
 
