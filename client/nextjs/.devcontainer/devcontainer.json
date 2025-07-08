@@ -6,7 +6,8 @@
     "PROCESS_ENV": "local",
     "CLIENT_NEXTJS_TEMPLATE_AWS_ACCESS_KEY": "",
     "CLIENT_NEXTJS_TEMPLATE_AWS_SECRET_ACCESS_KEY": "",
-    "CLIENT_NEXTJS_TEMPLATE_AWS_REGION": ""
+    "CLIENT_NEXTJS_TEMPLATE_AWS_REGION": "",
+    "NEXTAUTH_URL": ""
   },
   "workspaceFolder": "/workspaces/nagiyu-template/client/nextjs/nextjs.code-workspace",
   "customizations": {
