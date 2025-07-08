@@ -53,7 +53,8 @@ jobs:
     - name: Checkout New Branch
       run: |
         cd nagiyu-template
-        git checkout -b ${{ env.BRANCH_NAME }}
+        git fetch origin template/client-nextjs
+        git checkout -b ${{ env.BRANCH_NAME }} origin/template/client-nextjs
 
     - name: Copy Common Files
       run: |
