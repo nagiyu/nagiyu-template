@@ -12,7 +12,6 @@ on:
       - '.github/workflows/deploy.yml'
       - '.github/workflows/openhands-resolver.yml'
       - '.github/workflows/update-common.yml'
-      - 'client/common/*'
       - 'README.md'
 
 jobs:
@@ -46,7 +45,7 @@ jobs:
 
       - name: Apply Template to Target Repositories
         run: |
-          IFS=';' read -ra TARGETS <<< "${{ env.GITHUB_TEMPLATE_CLIENT_NEXTJS_TARGETS }}"
+          IFS=';' read -ra TARGETS <<< "${{ env.GITHUB_TEMPLATE_TARGETS }}"
           for TARGET in "${TARGETS[@]}"; do
             REPO_URL=$(echo "$TARGET" | cut -d',' -f1)
             BRANCH=$(echo "$TARGET" | cut -d',' -f2)
@@ -62,7 +61,6 @@ jobs:
             cp ../.github/workflows/deploy.yml .github/workflows/deploy.yml
             cp ../.github/workflows/openhands-resolver.yml .github/workflows/openhands-resolver.yml
             cp ../.github/workflows/update-common.yml .github/workflows/update-common.yml
-            cp -r ../client/common client/common
             cp ../README.md README.md
 
             git config --local user.name "${{ env.GITHUB_USERNAME }}"
