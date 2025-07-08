@@ -62,7 +62,7 @@ jobs:
             cp ../.github/workflows/deploy.yml .github/workflows/deploy.yml
             cp ../.github/workflows/openhands-resolver.yml .github/workflows/openhands-resolver.yml
             cp ../.github/workflows/update-common.yml .github/workflows/update-common.yml
-            cp -r ../client/common client/common
+            cp -r ../client/common client
             cp ../README.md README.md
 
             git config --local user.name "${{ env.GITHUB_USERNAME }}"

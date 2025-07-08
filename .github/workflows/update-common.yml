@@ -63,7 +63,7 @@ jobs:
         cp .github/workflows/deploy.yml nagiyu-template/.github/workflows/deploy.yml
         cp .github/workflows/openhands-resolver.yml nagiyu-template/.github/workflows/openhands-resolver.yml
         cp .github/workflows/update-common.yml nagiyu-template/.github/workflows/update-common.yml
-        cp -r client/common nagiyu-template/client/common
+        cp -r client/common nagiyu-template/client
         cp README.md nagiyu-template/README.md
 
     - name: Configure Git
