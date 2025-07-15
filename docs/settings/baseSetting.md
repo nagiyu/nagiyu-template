@@ -1,7 +1,5 @@
 # 基本設定内容
 
-このドキュメントは現行の README.md の内容を移植したものです。
-
 ## GitHub 設定
 
 - Settings -> General -> Pull Requests -> Automatically delete head branches: ON
