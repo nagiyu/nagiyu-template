@@ -57,13 +57,10 @@ jobs:
             cd "$REPO_NAME"
             git checkout "$BRANCH"
 
-            cp ../.github/ISSUE_TEMPLATE/issue.md .github/ISSUE_TEMPLATE/issue.md
-            cp ../.github/workflows/apply-template.yml .github/workflows/apply-template.yml
-            cp ../.github/workflows/deploy.yml .github/workflows/deploy.yml
-            cp ../.github/workflows/openhands-resolver.yml .github/workflows/openhands-resolver.yml
-            cp ../.github/workflows/update-common.yml .github/workflows/update-common.yml
-            cp ../docs/guides/index.md docs/guides/index.md
-            cp ../doce/settings/baseSetting.md doce/settings/baseSetting.md
+            git remote add base https://github.com/nagiyu/nagiyu-template.git || true
+            git fetch base
+            git merge base/master --no-edit
+
 
             git config --local user.name "${{ env.GITHUB_USERNAME }}"
             git config --local user.email "${{ env.GITHUB_EMAIL }}"
