@@ -2,17 +2,6 @@ name: Apply Template
 
 on:
   push:
-    branches:
-      - master
-      - develop
-      - template/*
-    paths:
-      - '.github/ISSUE_TEMPLATE/issue.md'
-      - '.github/workflows/apply-template.yml'
-      - '.github/workflows/deploy.yml'
-      - '.github/workflows/openhands-resolver.yml'
-      - 'docs/guides/index.md'
-      - 'doce/settings/baseSetting.md'
 
 jobs:
   apply-template:
@@ -42,7 +31,7 @@ jobs:
 
       - name: Apply Template to Target Repositories
         run: |
-          IFS=';' read -ra TARGETS <<< "${{ env.GITHUB_TEMPLATE_TARGETS }}"
+          IFS=';' read -ra TARGETS <<< "${{ env.TEMPLATE_TARGETS }}"
           for TARGET in "${TARGETS[@]}"; do
             REPO_URL=$(echo "$TARGET" | cut -d',' -f1)
             BRANCH=$(echo "$TARGET" | cut -d',' -f2)
