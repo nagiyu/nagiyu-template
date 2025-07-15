@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy-client-tools:
+  deploy-client-nextjs:
     runs-on: ubuntu-latest
 
     environment:
@@ -38,25 +38,25 @@ jobs:
           AWS_SECRETS, AWS
         parse-json-secrets: true
 
-    - name: Get TOOLS from Tools
+    - name: Get CLIENT_NEXTJS_TEMPLATE from ClientNextjsTemplate
       if: ${{ startsWith(github.ref, 'refs/heads/master') }}
       uses: aws-actions/aws-secretsmanager-get-secrets@v2
       with:
         secret-ids: |
-          TOOLS, Tools
+          CLIENT_NEXTJS_TEMPLATE, ClientNextjsTemplate
         parse-json-secrets: true
 
-    - name: Get TOOLS from DevTools
+    - name: Get CLIENT_NEXTJS_TEMPLATE from DevClientNextjsTemplate
       if: ${{ !startsWith(github.ref, 'refs/heads/master') }}
       uses: aws-actions/aws-secretsmanager-get-secrets@v2
       with:
         secret-ids: |
-          TOOLS, DevTools
+          CLIENT_NEXTJS_TEMPLATE, ClientNextjsTemplate
         parse-json-secrets: true
 
     - name: Rewrite sw.js endpoint from secrets
       run: |
-        sed -i 's|http://localhost:3000|${{ env.TOOLS_CLIENT_BASE_URL }}|g' client/tools/public/sw.js
+        sed -i 's|http://localhost:3000|${{ env.CLIENT_NEXTJS_TEMPLATE_CLIENT_BASE_URL }}|g' client/nextjs/public/sw.js
 
     - name: Deploy
       run: |
@@ -65,14 +65,14 @@ jobs:
         docker build \
           --build-arg PROCESS_ENV=${{ github.ref == 'refs/heads/master' && 'production' || 'development' }} \
           --build-arg PROJECT_SECRET=${{ github.ref == 'refs/heads/master' && 'Tools' || 'DevTools' }} \
-          --build-arg TOOLS_AWS_ACCESS_KEY=${{ env.TOOLS_AWS_ACCESS_KEY }} \
-          --build-arg TOOLS_AWS_SECRET_ACCESS_KEY=${{ env.TOOLS_AWS_SECRET_ACCESS_KEY }} \
-          --build-arg TOOLS_AWS_REGION=${{ env.TOOLS_AWS_REGION }} \
-          --build-arg NEXTAUTH_URL=${{ env.TOOLS_NEXTAUTH_URL }} \
-          -f tools/Dockerfile \
-          -t ${{ env.TOOLS_CLIENT_PROJECT_NAME }} .
-        docker tag ${{ env.TOOLS_CLIENT_PROJECT_NAME }}:latest ${{ env.AWS_SECRETS_REPOSITORY_ID }}.dkr.ecr.${{ env.AWS_SECRETS_REGION }}.amazonaws.com/${{ env.TOOLS_CLIENT_PROJECT_NAME }}:latest
-        docker push ${{ env.AWS_SECRETS_REPOSITORY_ID }}.dkr.ecr.${{ env.AWS_SECRETS_REGION }}.amazonaws.com/${{ env.TOOLS_CLIENT_PROJECT_NAME }}:latest
+          --build-arg CLIENT_NEXTJS_TEMPLATE_AWS_ACCESS_KEY=${{ env.CLIENT_NEXTJS_TEMPLATE_AWS_ACCESS_KEY }} \
+          --build-arg CLIENT_NEXTJS_TEMPLATE_AWS_SECRET_ACCESS_KEY=${{ env.CLIENT_NEXTJS_TEMPLATE_AWS_SECRET_ACCESS_KEY }} \
+          --build-arg CLIENT_NEXTJS_TEMPLATE_AWS_REGION=${{ env.CLIENT_NEXTJS_TEMPLATE_AWS_REGION }} \
+          --build-arg NEXTAUTH_URL=${{ env.CLIENT_NEXTJS_TEMPLATE_NEXTAUTH_URL }} \
+          -f nextjs/Dockerfile \
+          -t ${{ env.CLIENT_NEXTJS_TEMPLATE_CLIENT_PROJECT_NAME }} .
+        docker tag ${{ env.CLIENT_NEXTJS_TEMPLATE_CLIENT_PROJECT_NAME }}:latest ${{ env.AWS_SECRETS_REPOSITORY_ID }}.dkr.ecr.${{ env.AWS_SECRETS_REGION }}.amazonaws.com/${{ env.CLIENT_NEXTJS_TEMPLATE_CLIENT_PROJECT_NAME }}:latest
+        docker push ${{ env.AWS_SECRETS_REPOSITORY_ID }}.dkr.ecr.${{ env.AWS_SECRETS_REGION }}.amazonaws.com/${{ env.CLIENT_NEXTJS_TEMPLATE_CLIENT_PROJECT_NAME }}:latest
 
     - name: Update Lambda Function
       run: |
