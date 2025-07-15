@@ -40,14 +40,18 @@ jobs:
             REPO_NAME=$(basename -s .git "$REPO_URL")
             echo "Processing $REPO_URL ($BRANCH)"
 
+            git config --local user.name "${{ env.GITHUB_USERNAME }}"
+            git config --local user.email "${{ env.GITHUB_EMAIL }}"
+
             git clone "$REPO_URL"
             cd "$REPO_NAME"
             git checkout "$BRANCH"
 
-            git config --local user.name "${{ env.GITHUB_USERNAME }}"
-            git config --local user.email "${{ env.GITHUB_EMAIL }}"
+            BRANCH_NAME="apply-template-$(date +%Y%m%d-%H%M%S)"
+            git checkout -b "$BRANCH_NAME"
 
             git remote add base https://github.com/nagiyu/nagiyu-template.git || true
+            git fetch base
             
             git merge -X theirs base/master --allow-unrelated-histories || true
             
@@ -62,9 +66,6 @@ jobs:
             fi
             
             git remote set-url origin "https://x-access-token:${{ env.GITHUB_PERSONAL_ACCESS_TOKEN }}@${REPO_URL#https://}"
-
-            BRANCH_NAME="apply-template-$(date +%Y%m%d-%H%M%S)"
-            git checkout -b "$BRANCH_NAME"
 
             if [ -n "$(git status --porcelain)" ]; then
               git add .
