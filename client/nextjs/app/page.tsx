@@ -13,9 +13,7 @@ export default async function Home() {
 
   return (
     <div className={styles.page}>
-      <BasicAppBar align='right'>
-        {!session ? <SignInButton /> : <SignOutButton />}
-      </BasicAppBar>
+      <BasicAppBar right={!session ? <SignInButton /> : <SignOutButton />} />
 
       {!session ? <GuestContent /> : <SignedInContent session={session} />}
     </div>
