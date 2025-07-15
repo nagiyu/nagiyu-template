@@ -10,17 +10,19 @@ export default class DynamoDBUtil {
    * @returns {DynamoDBClient} The configured DynamoDBClient.
    */
   private async getDynamoClient(): Promise<DynamoDBClient> {
+    const secretName = process.env.PROJECT_SECRET!;
+
     if (process.env.PROCESS_ENV !== 'local') {
       return new DynamoDBClient({
-        region: await SecretsManagerUtil.getSecretValue('ClientNextjsTemplate', 'AWS_REGION'),
+        region: await SecretsManagerUtil.getSecretValue(secretName, 'AWS_REGION'),
       });
     }
 
     return new DynamoDBClient({
-      region: await SecretsManagerUtil.getSecretValue('ClientNextjsTemplate', 'AWS_REGION'),
+      region: await SecretsManagerUtil.getSecretValue(secretName, 'AWS_REGION'),
       credentials: {
-        accessKeyId: await SecretsManagerUtil.getSecretValue('ClientNextjsTemplate', 'AWS_ACCESS_KEY'),
-        secretAccessKey: await SecretsManagerUtil.getSecretValue('ClientNextjsTemplate', 'AWS_SECRET_ACCESS_KEY')
+        accessKeyId: await SecretsManagerUtil.getSecretValue(secretName, 'AWS_ACCESS_KEY'),
+        secretAccessKey: await SecretsManagerUtil.getSecretValue(secretName, 'AWS_SECRET_ACCESS_KEY')
       }
     });
   }

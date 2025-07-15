@@ -4,6 +4,7 @@
   "remoteUser": "node",
   "containerEnv": {
     "PROCESS_ENV": "local",
+    "PROJECT_SECRET": "ClientNextjsTemplate",
     "CLIENT_NEXTJS_TEMPLATE_AWS_ACCESS_KEY": "",
     "CLIENT_NEXTJS_TEMPLATE_AWS_SECRET_ACCESS_KEY": "",
     "CLIENT_NEXTJS_TEMPLATE_AWS_REGION": "",
