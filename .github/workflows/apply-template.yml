@@ -59,8 +59,7 @@ jobs:
 
             git remote add base https://github.com/nagiyu/nagiyu-template.git || true
             git fetch base
-            git merge base/master --no-edit
-
+            git merge base/master --allow-unrelated-histories
 
             git config --local user.name "${{ env.GITHUB_USERNAME }}"
             git config --local user.email "${{ env.GITHUB_EMAIL }}"
