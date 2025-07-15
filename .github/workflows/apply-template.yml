@@ -31,7 +31,7 @@ jobs:
 
       - name: Apply Template to Target Repositories
         run: |
-          IFS=';' read -ra TARGETS <<< "${{ env.TEMPLATE_TARGETS }}"
+          IFS=';' read -ra TARGETS <<< "${{ vars.TEMPLATE_TARGETS }}"
           for TARGET in "${TARGETS[@]}"; do
             REPO_URL=$(echo "$TARGET" | cut -d',' -f1)
             BRANCH=$(echo "$TARGET" | cut -d',' -f2)
