@@ -6,12 +6,6 @@ on:
       - master
       - develop
       - template/*
-    paths:
-      - '.github/ISSUE_TEMPLATE/issue.md'
-      - '.github/workflows/template/*'
-      - '.github/workflows/openhands-resolver.yml'
-      - 'docs/guides/index.md'
-      - 'doce/settings/baseSetting.md'
 
 jobs:
   apply-template:
