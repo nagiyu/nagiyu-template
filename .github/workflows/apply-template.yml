@@ -59,7 +59,7 @@ jobs:
 
             git remote add base https://github.com/nagiyu/nagiyu-template.git || true
             git fetch base
-            git merge base/master --allow-unrelated-histories
+            git merge -X theirs base/master --allow-unrelated-histories
             
             git remote set-url origin "https://x-access-token:${{ env.GITHUB_PERSONAL_ACCESS_TOKEN }}@${REPO_URL#https://}"
 
