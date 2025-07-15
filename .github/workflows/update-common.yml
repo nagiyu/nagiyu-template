@@ -41,9 +41,6 @@ jobs:
           GitHub
         parse-json-secrets: true
 
-    - name: Checkout
-      uses: actions/checkout@v2
-
     - name: Clone Target Repository
       run: git clone https://github.com/nagiyu/nagiyu-template.git
 
@@ -68,8 +65,7 @@ jobs:
     - name: Merge base branch
       run: |
         cd nagiyu-template
-        git merge base/master --no-edit
-
+        git merge base/master --allow-unrelated-histories
 
     - name: Configure Git
       run: |
