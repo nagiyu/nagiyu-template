@@ -58,16 +58,17 @@ jobs:
 
             git remote add base https://github.com/nagiyu/nagiyu-template.git || true
             
-            git fetch base
-            # base/master で消えているファイル一覧を取得
-            DELETED_FILES=$(git diff --name-only --diff-filter=D base/master HEAD)
-            for file in $DELETED_FILES; do
-              if [ -f "$file" ]; then
-                git rm "$file"
-              fi
-            done
+            git merge -X theirs base/master --allow-unrelated-histories || true
             
-            git merge -X theirs base/master --allow-unrelated-histories
+            if [ -f .git/MERGE_HEAD ]; then
+              git status --porcelain | grep '^DU ' | awk '{print $2}' | while read file; do
+                git rm -f "$file"
+              done
+              git diff --name-only --diff-filter=U | while read file; do
+                git checkout --theirs "$file"
+                git add "$file"
+              done
+            fi
             
             git remote set-url origin "https://x-access-token:${{ env.GITHUB_PERSONAL_ACCESS_TOKEN }}@${REPO_URL#https://}"
 
