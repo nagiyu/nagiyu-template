@@ -41,9 +41,6 @@ jobs:
           GitHub
         parse-json-secrets: true
 
-    - name: Checkout
-      uses: actions/checkout@v2
-
     - name: Clone Target Repository
       run: git clone https://github.com/nagiyu/nagiyu-template.git
 
@@ -55,15 +52,20 @@ jobs:
         cd nagiyu-template
         git checkout -b ${{ env.BRANCH_NAME }}
 
-    - name: Copy Common Files
+    - name: Add base repository remote
       run: |
-        cp .github/ISSUE_TEMPLATE/issue.md nagiyu-template/.github/ISSUE_TEMPLATE/issue.md
-        cp .github/workflows/apply-template.yml nagiyu-template/.github/workflows/apply-template.yml
-        cp .github/workflows/deploy.yml nagiyu-template/.github/workflows/deploy.yml
-        cp .github/workflows/openhands-resolver.yml nagiyu-template/.github/workflows/openhands-resolver.yml
-        cp .github/workflows/update-common.yml nagiyu-template/.github/workflows/update-common.yml
-        cp docs/guides/index.md nagiyu-template/docs/guides/index.md
-        cp doce/settings/baseSetting.md nagiyu-template/doce/settings/baseSetting.md
+        cd nagiyu-template
+        git remote add base https://github.com/nagiyu/nagiyu-template.git || true
+
+    - name: Fetch base repository
+      run: |
+        cd nagiyu-template
+        git fetch base
+
+    - name: Merge base branch
+      run: |
+        cd nagiyu-template
+        git merge base/master --allow-unrelated-histories
 
     - name: Configure Git
       run: |
