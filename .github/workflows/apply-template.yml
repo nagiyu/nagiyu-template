@@ -41,6 +41,11 @@ jobs:
             GitHub
           parse-json-secrets: true
 
+      - name: Set Git Configure
+        run: |
+            git config --local user.name "${{ env.GITHUB_USERNAME }}"
+            git config --local user.email "${{ env.GITHUB_EMAIL }}"
+
       - name: Apply Template to Target Repositories
         run: |
           IFS=';' read -ra TARGETS <<< "${{ env.GITHUB_TEMPLATE_TARGETS }}"
@@ -57,9 +62,7 @@ jobs:
             git remote add base https://github.com/nagiyu/nagiyu-template.git || true
             git fetch base
             git merge base/master --allow-unrelated-histories
-
-            git config --local user.name "${{ env.GITHUB_USERNAME }}"
-            git config --local user.email "${{ env.GITHUB_EMAIL }}"
+            
             git remote set-url origin "https://x-access-token:${{ env.GITHUB_PERSONAL_ACCESS_TOKEN }}@${REPO_URL#https://}"
 
             BRANCH_NAME="apply-template-$(date +%Y%m%d-%H%M%S)"
