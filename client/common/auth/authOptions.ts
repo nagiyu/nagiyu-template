@@ -7,11 +7,11 @@ import SecretsManagerUtil from '@common/aws/SecretsManagerUtil';
 export const authOptions: AuthOptions = {
   providers: [
     GoogleProvider({
-      clientId: await SecretsManagerUtil.getSecretValue('ClientNextjsTemplate', 'GOOGLE_CLIENT_ID', true),
-      clientSecret: await SecretsManagerUtil.getSecretValue('ClientNextjsTemplate', 'GOOGLE_CLIENT_SECRET', true),
+      clientId: await SecretsManagerUtil.getSecretValue(process.env.PROJECT_SECRET!, 'GOOGLE_CLIENT_ID', true),
+      clientSecret: await SecretsManagerUtil.getSecretValue(process.env.PROJECT_SECRET!, 'GOOGLE_CLIENT_SECRET', true),
     })
   ],
-  secret: await SecretsManagerUtil.getSecretValue('ClientNextjsTemplate', 'NEXTAUTH_SECRET', true),
+  secret: await SecretsManagerUtil.getSecretValue(process.env.PROJECT_SECRET!, 'NEXTAUTH_SECRET', true),
   callbacks: {
     async jwt({ token, user, account }) {
       if (user && account) {
