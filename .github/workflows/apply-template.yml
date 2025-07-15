@@ -40,11 +40,12 @@ jobs:
             REPO_NAME=$(basename -s .git "$REPO_URL")
             echo "Processing $REPO_URL ($BRANCH)"
 
-            git config --local user.name "${{ env.GITHUB_USERNAME }}"
-            git config --local user.email "${{ env.GITHUB_EMAIL }}"
-
             git clone "$REPO_URL"
             cd "$REPO_NAME"
+
+            git config --local user.name "${{ env.GITHUB_USERNAME }}"
+            git config --local user.email "${{ env.GITHUB_EMAIL }}"
+            
             git checkout "$BRANCH"
 
             BRANCH_NAME="apply-template-$(date +%Y%m%d-%H%M%S)"
