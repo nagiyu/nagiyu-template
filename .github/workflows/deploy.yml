@@ -76,4 +76,5 @@ jobs:
 
     - name: Update Lambda Function
       run: |
-        aws lambda update-function-code --function-name ${{ env.TOOLS_CLIENT_PROJECT_NAME }} --image-uri ${{ env.AWS_SECRETS_REPOSITORY_ID }}.dkr.ecr.${{ env.AWS_SECRETS_REGION }}.amazonaws.com/${{ env.TOOLS_CLIENT_PROJECT_NAME }}:latest
+        aws lambda update-function-code --function-name ${{ env.CLIENT_NEXTJS_TEMPLATE_CLIENT_PROJECT_NAME }} --image-uri ${{ env.AWS_SECRETS_REPOSITORY_ID }}.dkr.ecr.${{ env.AWS_SECRETS_REGION }}.amazonaws.com/${{ env.CLIENT_NEXTJS_TEMPLATE_CLIENT_PROJECT_NAME }}:latest
+      
