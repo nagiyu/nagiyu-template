@@ -2,6 +2,8 @@ name: Apply Template
 
 on:
   push:
+    branches:
+      - master
 
 jobs:
   apply-template:
