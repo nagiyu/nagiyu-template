@@ -5,6 +5,7 @@ export function useNotificationManager() {
   const [isSupported, setIsSupported] = useState(false)
   const [subscription, setSubscription] = useState<PushSubscription | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const secretName = process.env.PROJECT_SECRET!;
 
   useEffect(() => {
     if ('serviceWorker' in navigator && 'PushManager' in window) {
@@ -65,7 +66,7 @@ export function useNotificationManager() {
       const sub = await registration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(
-          await SecretsManagerUtil.getSecretValue('DevTools', 'VAPID_PUBLIC_KEY', true)
+          await SecretsManagerUtil.getSecretValue(secretName, 'VAPID_PUBLIC_KEY', true)
         ),
       })
       setSubscription(sub)
