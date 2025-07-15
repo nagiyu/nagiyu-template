@@ -12,7 +12,8 @@ on:
       - '.github/workflows/deploy.yml'
       - '.github/workflows/openhands-resolver.yml'
       - '.github/workflows/update-common.yml'
-      - 'README.md'
+      - 'docs/guides/index.md'
+      - 'doce/settings/baseSetting.md'
 
 jobs:
   apply-template:
@@ -61,7 +62,8 @@ jobs:
             cp ../.github/workflows/deploy.yml .github/workflows/deploy.yml
             cp ../.github/workflows/openhands-resolver.yml .github/workflows/openhands-resolver.yml
             cp ../.github/workflows/update-common.yml .github/workflows/update-common.yml
-            cp ../README.md README.md
+            cp ../docs/guides/index.md docs/guides/index.md
+            cp ../doce/settings/baseSetting.md doce/settings/baseSetting.md
 
             git config --local user.name "${{ env.GITHUB_USERNAME }}"
             git config --local user.email "${{ env.GITHUB_EMAIL }}"
