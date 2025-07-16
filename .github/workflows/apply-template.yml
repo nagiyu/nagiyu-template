@@ -57,12 +57,20 @@ jobs:
             git merge -X theirs base/master --allow-unrelated-histories || true
             
             if [ -f .git/MERGE_HEAD ]; then
+              # 削除競合（DU）を削除
               git status --porcelain | grep '^DU ' | awk '{print $2}' | while read file; do
                 git rm -f "$file"
               done
+            
+              # 競合ファイルを処理
               git diff --name-only --diff-filter=U | while read file; do
-                git checkout --theirs "$file"
-                git add "$file"
+                # "theirs"側にバージョンがなければ git rm、それ以外は checkout --theirs
+                if git show ":3:$file" > /dev/null 2>&1; then
+                  git checkout --theirs "$file"
+                  git add "$file"
+                else
+                  git rm -f "$file"
+                fi
               done
             fi
             
