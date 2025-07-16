@@ -3,17 +3,7 @@ name: Apply Template
 on:
   push:
     branches:
-      - master
-      - develop
-      - template/*
-    paths:
-      - '.github/ISSUE_TEMPLATE/issue.md'
-      - '.github/workflows/apply-template.yml'
-      - '.github/workflows/deploy.yml'
-      - '.github/workflows/openhands-resolver.yml'
-      - '.github/workflows/update-common.yml'
-      - 'client/common/*'
-      - 'README.md'
+      - template/client-nextjs
 
 jobs:
   apply-template:
@@ -41,12 +31,9 @@ jobs:
             GitHub
           parse-json-secrets: true
 
-      - name: Checkout Template Repository
-        uses: actions/checkout@v2
-
       - name: Apply Template to Target Repositories
         run: |
-          IFS=';' read -ra TARGETS <<< "${{ env.GITHUB_TEMPLATE_CLIENT_NEXTJS_TARGETS }}"
+          IFS=';' read -ra TARGETS <<< "${{ vars.TEMPLATE_CLIENT_NEXTJS_TARGETS }}"
           for TARGET in "${TARGETS[@]}"; do
             REPO_URL=$(echo "$TARGET" | cut -d',' -f1)
             BRANCH=$(echo "$TARGET" | cut -d',' -f2)
@@ -55,22 +42,39 @@ jobs:
 
             git clone "$REPO_URL"
             cd "$REPO_NAME"
-            git checkout "$BRANCH"
-
-            cp ../.github/ISSUE_TEMPLATE/issue.md .github/ISSUE_TEMPLATE/issue.md
-            cp ../.github/workflows/apply-template.yml .github/workflows/apply-template.yml
-            cp ../.github/workflows/deploy.yml .github/workflows/deploy.yml
-            cp ../.github/workflows/openhands-resolver.yml .github/workflows/openhands-resolver.yml
-            cp ../.github/workflows/update-common.yml .github/workflows/update-common.yml
-            cp -r ../client/common client
-            cp ../README.md README.md
 
             git config --local user.name "${{ env.GITHUB_USERNAME }}"
             git config --local user.email "${{ env.GITHUB_EMAIL }}"
-            git remote set-url origin "https://x-access-token:${{ env.GITHUB_PERSONAL_ACCESS_TOKEN }}@${REPO_URL#https://}"
+            
+            git checkout "$BRANCH"
 
             BRANCH_NAME="apply-template-$(date +%Y%m%d-%H%M%S)"
             git checkout -b "$BRANCH_NAME"
+
+            git remote add base https://github.com/nagiyu/nagiyu-template.git || true
+            git fetch base
+            
+            git merge -X theirs base/template/client-nextjs --allow-unrelated-histories || true
+            
+            if [ -f .git/MERGE_HEAD ]; then
+              # 削除競合（DU）を削除
+              git status --porcelain | grep '^DU ' | awk '{print $2}' | while read file; do
+                git rm -f "$file"
+              done
+            
+              # 競合ファイルを処理
+              git diff --name-only --diff-filter=U | while read file; do
+                # "theirs"側にバージョンがなければ git rm、それ以外は checkout --theirs
+                if git show ":3:$file" > /dev/null 2>&1; then
+                  git checkout --theirs "$file"
+                  git add "$file"
+                else
+                  git rm -f "$file"
+                fi
+              done
+            fi
+            
+            git remote set-url origin "https://x-access-token:${{ env.GITHUB_PERSONAL_ACCESS_TOKEN }}@${REPO_URL#https://}"
 
             if [ -n "$(git status --porcelain)" ]; then
               git add .

@@ -3,17 +3,7 @@ name: Update Common
 on:
   push:
     branches:
-      - master
-      - develop
-      - template/*
-    paths:
-      - '.github/ISSUE_TEMPLATE/issue.md'
-      - '.github/workflows/apply-template.yml'
-      - '.github/workflows/deploy.yml'
-      - '.github/workflows/openhands-resolver.yml'
-      - '.github/workflows/update-common.yml'
-      - 'client/common/*'
-      - 'README.md'
+      - template/client-nextjs
 
 jobs:
   update-common:
@@ -96,4 +86,4 @@ jobs:
         GH_TOKEN: ${{ env.GITHUB_PERSONAL_ACCESS_TOKEN }}
       run: |
         cd nagiyu-template
-        gh pr create --title "Update common files" --body "This PR updates common files from the child repository." --base master --head ${{ env.BRANCH_NAME }} --draft  
+        gh pr create --title "Update common files" --body "This PR updates common files from the child repository." --base master --head ${{ env.BRANCH_NAME }} --draft
