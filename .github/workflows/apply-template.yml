@@ -3,7 +3,7 @@ name: Apply Template
 on:
   push:
     branches:
-      - master
+      - template/client-nextjs
 
 jobs:
   apply-template:
@@ -33,7 +33,7 @@ jobs:
 
       - name: Apply Template to Target Repositories
         run: |
-          IFS=';' read -ra TARGETS <<< "${{ vars.TEMPLATE_TARGETS }}"
+          IFS=';' read -ra TARGETS <<< "${{ vars.TEMPLATE_CLIENT_NEXTJS_TARGETS }}"
           for TARGET in "${TARGETS[@]}"; do
             REPO_URL=$(echo "$TARGET" | cut -d',' -f1)
             BRANCH=$(echo "$TARGET" | cut -d',' -f2)
@@ -64,7 +64,7 @@ jobs:
               done
             fi
             
-            git merge -X theirs base/master --allow-unrelated-histories || true
+            git merge -X theirs base/template/client-nextjs --allow-unrelated-histories || true
             
             git remote set-url origin "https://x-access-token:${{ env.GITHUB_PERSONAL_ACCESS_TOKEN }}@${REPO_URL#https://}"
 
