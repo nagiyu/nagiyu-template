@@ -54,6 +54,8 @@ jobs:
             git remote add base https://github.com/nagiyu/nagiyu-template.git || true
             git fetch base
             
+            git merge -X theirs base/master --allow-unrelated-histories || true
+            
             if [ -f .git/MERGE_HEAD ]; then
               git status --porcelain | grep '^DU ' | awk '{print $2}' | while read file; do
                 git rm -f "$file"
@@ -63,8 +65,6 @@ jobs:
                 git add "$file"
               done
             fi
-            
-            git merge -X theirs base/master --allow-unrelated-histories || true
             
             git remote set-url origin "https://x-access-token:${{ env.GITHUB_PERSONAL_ACCESS_TOKEN }}@${REPO_URL#https://}"
 
