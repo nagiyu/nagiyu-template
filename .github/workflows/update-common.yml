@@ -3,88 +3,92 @@ name: Update Common
 on:
   push:
     branches:
-      - master
+      - template/client-nextjs
 
 jobs:
   update-common:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+    - name: AWS CLI install
+      run: |
+        curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+        unzip awscliv2.zip
+        sudo ./aws/install --update
+        aws --version
 
-      - name: AWS CLI install
-        run: |
-          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-          unzip awscliv2.zip
-          sudo ./aws/install --update
-          aws --version
+    - name: AWS set Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: AWS set Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+    - name: Get Secrets from AWS SecretsManager
+      uses: aws-actions/aws-secretsmanager-get-secrets@v2
+      with:
+        secret-ids: |
+          GitHub
+        parse-json-secrets: true
 
-      - name: Update Common to Target Repositories
-        run: |
-          IFS=';' read -ra TARGETS <<< "${{ vars.UPDATE_COMMON_TARGETS }}"
-          for TARGET in "${TARGETS[@]}"; do
-            REPO_URL=$(echo "$TARGET" | cut -d',' -f1)
-            BRANCH=$(echo "$TARGET" | cut -d',' -f2)
-            REPO_NAME=$(basename -s .git "$REPO_URL")
-            echo "Processing $REPO_URL ($BRANCH)"
+    - name: Checkout
+      uses: actions/checkout@v2
 
-            git clone "$REPO_URL"
-            cd "$REPO_NAME"
+    - name: Set branch name
+      run: echo "BRANCH_NAME=feature/update-common-$(date +%Y%m%d-%H%M%S)" >> $GITHUB_ENV
 
-            git config --local user.name "${{ env.GITHUB_USERNAME }}"
-            git config --local user.email "${{ env.GITHUB_EMAIL }}"
+    - name: Set Target Repository
+      run: |
+        git remote add base https://github.com/nagiyu/nagiyu-template.git || true
+        git fetch base
 
-            git checkout "$BRANCH"
+    - name: Checkout New Branch
+      run: |
+        cd nagiyu-template
+        git fetch origin template/client-nextjs
+        git checkout -b ${{ env.BRANCH_NAME }} origin/template/client-nextjs
 
-            BRANCH_NAME="update-common-$(date +%Y%m%d-%H%M%S)"
-            git checkout -b "$BRANCH_NAME"
+    - name: Copy Common Files
+      run: |
+        cp .github/ISSUE_TEMPLATE/issue.md nagiyu-template/.github/ISSUE_TEMPLATE/issue.md
+        cp .github/workflows/apply-template.yml nagiyu-template/.github/workflows/apply-template.yml
+        cp .github/workflows/deploy.yml nagiyu-template/.github/workflows/deploy.yml
+        cp .github/workflows/openhands-resolver.yml nagiyu-template/.github/workflows/openhands-resolver.yml
+        cp .github/workflows/update-common.yml nagiyu-template/.github/workflows/update-common.yml
+        cp -r client/common nagiyu-template/client
+        cp README.md nagiyu-template/README.md
 
-            git remote add base https://github.com/nagiyu/nagiyu-template.git || true
-            git fetch base
+    - name: Configure Git
+      run: |
+        cd nagiyu-template
+        git config --local user.name "${{ env.GITHUB_USERNAME }}"
+        git config --local user.email "${{ env.GITHUB_EMAIL }}"
+    
+    - name: Set up push authentication
+      run: |
+        cd nagiyu-template
+        git remote set-url origin https://x-access-token:${{ env.GITHUB_PERSONAL_ACCESS_TOKEN }}@github.com/nagiyu/nagiyu-template.git
 
-            git merge -X theirs base/master --allow-unrelated-histories || true
+    - name: Commit and Push if Changes Exist
+      run: |
+        cd nagiyu-template
+        if [ -n "$(git status --porcelain)" ]; then
+          # Remove unwanted files before commit
+          git restore .github/workflows/update-common.yml README.md
 
-            if [ -f .git/MERGE_HEAD ]; then
-              # Remove delete conflicts (DU)
-              git status --porcelain | grep '^DU ' | awk '{print $2}' | while read file; do
-                git rm -f "$file"
-              done
+          git add .
+          git commit -m "Update common files from the child repository"
+          git push origin ${{ env.BRANCH_NAME }}
+          echo "CHANGES_EXIST=true" >> $GITHUB_ENV
+        else
+          echo "No changes to commit."
+          echo "CHANGES_EXIST=false" >> $GITHUB_ENV
+        fi
 
-              # Handle conflict files
-              git diff --name-only --diff-filter=U | while read file; do
-                if git show ":3:$file" > /dev/null 2>&1; then
-                  git checkout --theirs "$file"
-                  git add "$file"
-                else
-                  git rm -f "$file"
-                fi
-              done
-            fi
-
-            git remote set-url origin "https://x-access-token:${{ env.GITHUB_PERSONAL_ACCESS_TOKEN }}@${REPO_URL#https://}"
-
-            if [ -n "$(git status --porcelain)" ]; then
-              # Remove unwanted files before commit
-              git restore .github/workflows/update-common.yml README.md
-
-              git add .
-              git commit -m "Update common files"
-              git push origin "$BRANCH_NAME"
-
-              export GH_TOKEN="${{ env.GITHUB_PERSONAL_ACCESS_TOKEN }}"
-              gh pr create --title "Update common files" --body "This PR updates common files." --base "$BRANCH" --head "$BRANCH_NAME" --draft
-            else
-              echo "No changes to commit for $REPO_URL"
-            fi
-
-            cd ..
-            rm -rf "$REPO_NAME"
-          done
+    - name: Create Pull Request
+      if: env.CHANGES_EXIST == 'true'
+      env:
+        GH_TOKEN: ${{ env.GITHUB_PERSONAL_ACCESS_TOKEN }}
+      run: |
+        cd nagiyu-template
+        gh pr create --title "Update common files" --body "This PR updates common files from the child repository." --base master --head ${{ env.BRANCH_NAME }} --draft
