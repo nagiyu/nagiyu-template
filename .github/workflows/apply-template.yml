@@ -78,7 +78,7 @@ jobs:
 
             if [ -n "$(git status --porcelain)" ]; then
               # Remove unwanted files before commit
-              rm -f .github/workflows/apply-template.yml README.md
+              git restore .github/workflows/apply-template.yml README.md
 
               git add .
               git commit -m "Apply template updates"
