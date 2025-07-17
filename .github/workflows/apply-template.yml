@@ -77,6 +77,13 @@ jobs:
             git remote set-url origin "https://x-access-token:${{ env.GITHUB_PERSONAL_ACCESS_TOKEN }}@${REPO_URL#https://}"
 
             if [ -n "$(git status --porcelain)" ]; then
+              # Remove unwanted files before commit
+              git restore .github/workflows/apply-template.yml
+              git restore .github/workflows/deploy.yml
+              git restore .github/workflows/update-common.yml
+              git restore client
+              git restore README.md
+              
               git add .
               git commit -m "Apply template updates"
               git push origin "$BRANCH_NAME"
